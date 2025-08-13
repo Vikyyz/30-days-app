@@ -11,33 +11,29 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.example.a30daysapp.R
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = Surface,
+    secondary = Surface,
+    tertiary = Surface
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = Primary,
+    secondary = Secondary,
+    background = Background,
+    surface = Surface,
+    onSurface = onSurface,
 )
 
 @Composable
 fun _30DaysAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -51,10 +47,39 @@ fun _30DaysAppTheme(
         else -> LightColorScheme
     }
 
+    val LexendGiga = FontFamily(
+        Font(R.font.lexend_giga, weight = FontWeight.Normal)
+    )
+    val AbrilFatface = FontFamily(
+        Font(R.font.abril_fatface, weight = FontWeight.Normal)
+    )
+
+    val MyTypography = androidx.compose.material3.Typography(
+        bodyLarge = androidx.compose.ui.text.TextStyle(
+            fontFamily = AbrilFatface,
+            fontWeight = FontWeight.Normal,
+            fontSize = 16.sp
+        ),
+        titleLarge = androidx.compose.ui.text.TextStyle(
+            fontFamily = AbrilFatface,
+            fontWeight = FontWeight.Bold,
+            fontSize = 19.sp
+        ),
+        labelSmall = androidx.compose.ui.text.TextStyle(
+            fontFamily = AbrilFatface,
+            fontWeight = FontWeight.Normal,
+            fontSize = 12.sp
+        ),
+        headlineSmall = androidx.compose.ui.text.TextStyle(
+            fontFamily = AbrilFatface,
+            fontWeight = FontWeight.Thin,
+            fontSize = 10.sp
+        ),
+    )
+
     MaterialTheme(
         colorScheme = colorScheme,
-//        shape = Shapes,
-        typography = Typography,
-        content = content
+        typography = MyTypography,
+        content = content,
     )
 }
