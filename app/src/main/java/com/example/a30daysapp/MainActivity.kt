@@ -45,6 +45,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -111,7 +112,7 @@ fun TipsCard(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete tip",
-                        tint = MaterialTheme.colorScheme.error,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(64.dp)
                     )
                 }
@@ -131,31 +132,36 @@ fun TipsCard(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(10.dp),
                 )
-            Column (
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Image(
-                    painter = painterResource(tip.imageResourceId),
-                    contentDescription = stringResource(tip.stringResourceId),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
-                        .width( 200.dp)
-                        .padding(start = 10.dp)
-                        .padding(end = 10.dp),
-                    contentScale = ContentScale.Crop,
-                )
-                Text (
-                    text = stringResource(tip.stringResourceId),
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier
-                        .padding(top = 10.dp)
-                        .padding(bottom = 5.dp)
-                        .padding(start = 10.dp)
-                        .padding(end = 10.dp),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+            Column {
+                Row (
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.Top,
+                ) {
+                    Image(
+                        painter = painterResource(tip.imageResourceId),
+                        contentDescription = stringResource(tip.stringResourceId),
+                        modifier = Modifier
+                            .height(100.dp)
+                            .width( 150.dp)
+                            .padding(start = 10.dp)
+                            .padding(end = 5.dp),
+                        contentScale = ContentScale.Crop,
+                    )
+                    Text (
+                        text = stringResource(tip.stringResourceId),
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier
+                            .padding(end = 10.dp),
+                    )
+                }
+                Text(
+                    modifier = Modifier.padding(
+                        start = 10.dp,
+                        end = 10.dp,
+                        top = 3.dp,
+                    ),
+
+                    text = "future music player"
                 )
             }
         }
@@ -226,7 +232,7 @@ fun ArtBlockDetailsHeaderItem(
             verticalAlignment = Alignment.Top
         ) {
             Image(
-                painter = painterResource(id = R.drawable.header1),
+                painter = painterResource(id = R.drawable.logo),
                 contentDescription = null,
                 modifier = Modifier
                     .size(110.dp),
@@ -249,6 +255,7 @@ fun ArtBlockDetailsHeaderItem(
                     Text(
                         text = "ANTI ART BLOCK",
                         style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.ExtraBold,
                         fontSize = 26.sp,
                         modifier = Modifier.padding(start = 4.dp),
                     )
@@ -277,13 +284,15 @@ fun ArtBlockDetailsHeaderItem(
             Text(
                 text = stringResource(R.string.Description),
                 maxLines = if (expanded) Int.MAX_VALUE else 3,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.labelSmall
+                overflow = TextOverflow.Clip,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.ExtraLight,
             )
 
             Text(
-                text = if (expanded) "See less" else "See more",
+                text = if (expanded) "see less" else "... see more",
                 style = MaterialTheme.typography.labelSmall,
+                color = Color(0xFFFFA726),
                 modifier = Modifier
                     .animateContentSize()
                     .clickable { expanded = !expanded }
@@ -304,7 +313,7 @@ fun TopOvalBackground(modifier: Modifier = Modifier) {
             val ovalHeight = size.height
             val topLeft = androidx.compose.ui.geometry.Offset(
                 x = (size.width - ovalWidth) / 2f,
-                y = -ovalHeight * 0.3f
+                y = -ovalHeight * 0.32f
             )
             drawOval(
                 color = androidx.compose.ui.graphics.Color(0xFFFFA726),
