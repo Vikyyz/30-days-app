@@ -5,7 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -42,16 +45,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.a30daysapp.model.Tip
 import com.example.a30daysapp.model.TipsViewModel
 import com.example.a30daysapp.ui.theme._30DaysAppTheme
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,14 +70,15 @@ class MainActivity : ComponentActivity() {
             _30DaysAppTheme {
                 val tipsViewModel: TipsViewModel = viewModel()
                 Scaffold (
+                    containerColor = MaterialTheme.colorScheme.background,
                     content =  {
-                        TipsList(
-                            tipsList = tipsViewModel.tips,
-                            onDelete = { tip ->
-                                tipsViewModel.removeTip(tip)
-                            },
-                            modifier = Modifier.padding(it)
-                        )
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            TipsList(
+                                tipsList = tipsViewModel.tips,
+                                onDelete = { tip -> tipsViewModel.removeTip(tip) },
+                                modifier = Modifier.padding(it)
+                            )
+                        }
                     }
                 )
             }
@@ -83,12 +93,7 @@ fun TipsCard(
     dismissState: SwipeToDismissBoxState,
     modifier: Modifier = Modifier
 ) {
-    Card(modifier = modifier.padding(8.dp), elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)) {
-        Text (
-            text = "Day ${tip.day + 1}",
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(10.dp)
-        )
+
         SwipeToDismissBox (
             state = dismissState,
             enableDismissFromEndToStart = true,
@@ -98,30 +103,59 @@ fun TipsCard(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(end = 16.dp),
+//                        .background(MaterialTheme.colorScheme.error.copy(alpha = 0.2f)),
                     contentAlignment = Alignment.CenterEnd,
+
                 )
                 {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete tip",
+                        tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(64.dp)
                     )
                 }
             }
         ) {
-            Column {
+            Card(
+                modifier = modifier
+                    .padding(8.dp)
+                    .padding(top = 8.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = RectangleShape,
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Text (
+                    text = "Day ${tip.day + 1}",
+                    color = MaterialTheme.colorScheme.background,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(10.dp),
+                )
+            Column (
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Image(
                     painter = painterResource(tip.imageResourceId),
                     contentDescription = stringResource(tip.stringResourceId),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(194.dp),
-                    contentScale = ContentScale.Crop
+                        .height(150.dp)
+                        .width( 200.dp)
+                        .padding(start = 10.dp)
+                        .padding(end = 10.dp),
+                    contentScale = ContentScale.Crop,
                 )
                 Text (
                     text = stringResource(tip.stringResourceId),
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .padding(bottom = 5.dp)
+                        .padding(start = 10.dp)
+                        .padding(end = 10.dp),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
@@ -174,6 +208,8 @@ fun ArtBlockDetailsHeaderItem(
     remainingTips: Int,
     modifier: Modifier = Modifier
 ) {
+    TopOvalBackground()
+
     val progress = 1f - (remainingTips.toFloat() / totalTips.toFloat())
 //    Header - Entire header
     Column(
@@ -197,20 +233,42 @@ fun ArtBlockDetailsHeaderItem(
                 contentScale = ContentScale.Crop
             )
 
-            Column(modifier = Modifier.padding(start = 8.dp)) {
-                Text(
-                    text = "30 Days to combat Art Block",
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                LinearProgressIndicator(
-                    progress = progress,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                    trackColor = ProgressIndicatorDefaults.linearTrackColor,
-                    strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
-                )
+            Column(
+                modifier = Modifier.padding(start = 8.dp)
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy((-9).dp)
+                ) {
+                    Text(
+                        text = "30 DAYS",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(start = 4.dp),
+                        color = MaterialTheme.colorScheme.background
+                        )
+
+                    Text(
+                        text = "ANTI ART BLOCK",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontSize = 26.sp,
+                        modifier = Modifier.padding(start = 4.dp),
+                    )
+                }
+                Column(
+                ) {
+                    Text(
+                        text = "Days remaining: $remainingTips",
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                    LinearProgressIndicator(
+                        progress = { progress },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        trackColor = MaterialTheme.colorScheme.background,
+                        strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+                    )
+                }
             }
         }
 //        Header - Description
@@ -218,14 +276,14 @@ fun ArtBlockDetailsHeaderItem(
         Column {
             Text(
                 text = stringResource(R.string.Description),
-                style = MaterialTheme.typography.bodyMedium,
                 maxLines = if (expanded) Int.MAX_VALUE else 3,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.labelSmall
             )
 
             Text(
                 text = if (expanded) "See less" else "See more",
-                style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.primary),
+                style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier
                     .animateContentSize()
                     .clickable { expanded = !expanded }
@@ -233,3 +291,28 @@ fun ArtBlockDetailsHeaderItem(
         }
     }
 }
+
+@Composable
+fun TopOvalBackground(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(200.dp)
+    ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val ovalWidth = size.width * 1.5f
+            val ovalHeight = size.height
+            val topLeft = androidx.compose.ui.geometry.Offset(
+                x = (size.width - ovalWidth) / 2f,
+                y = -ovalHeight * 0.3f
+            )
+            drawOval(
+                color = androidx.compose.ui.graphics.Color(0xFFFFA726),
+                topLeft = topLeft,
+                size = androidx.compose.ui.geometry.Size(ovalWidth, ovalHeight)
+            )
+        }
+    }
+}
+
+
