@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -93,10 +94,17 @@ fun TipsCard(
             enableDismissFromEndToStart = true,
             enableDismissFromStartToEnd = false,
             backgroundContent = {
-                Box {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(end = 16.dp),
+                    contentAlignment = Alignment.CenterEnd,
+                )
+                {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete tip",
+                        modifier = Modifier.size(64.dp)
                     )
                 }
             }
@@ -134,11 +142,13 @@ private fun TipsList(tipsList: List<Tip>, onDelete: (Tip) -> Unit, modifier: Mod
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         item (span = { GridItemSpan(this.maxLineSpan) }) {
-            ArtBlockDetailsHeaderItem()
+            ArtBlockDetailsHeaderItem(
+                totalTips = 10,
+                remainingTips = tipsList.size,
+            )
         }
 
         items(tipsList, key = { it.stringResourceId }) { tip ->
-            // Aceasta este într-un context @Composable, deci remember funcționează
             val dismissState = rememberSwipeToDismissBoxState(
                 confirmValueChange = { value ->
                     if (value == SwipeToDismissBoxValue.EndToStart) {
@@ -159,7 +169,12 @@ private fun TipsList(tipsList: List<Tip>, onDelete: (Tip) -> Unit, modifier: Mod
     }
 }
 @Composable
-fun ArtBlockDetailsHeaderItem(modifier: Modifier = Modifier) {
+fun ArtBlockDetailsHeaderItem(
+    totalTips: Int,
+    remainingTips: Int,
+    modifier: Modifier = Modifier
+) {
+    val progress = 1f - (remainingTips.toFloat() / totalTips.toFloat())
 //    Header - Entire header
     Column(
         modifier = modifier.padding(5.dp),
@@ -188,9 +203,7 @@ fun ArtBlockDetailsHeaderItem(modifier: Modifier = Modifier) {
                     style = MaterialTheme.typography.titleLarge,
                 )
                 LinearProgressIndicator(
-                    progress = {
-                        0.33f
-                    },
+                    progress = progress,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp),
