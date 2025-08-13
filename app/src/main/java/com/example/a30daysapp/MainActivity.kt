@@ -39,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -77,13 +78,13 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TipsCard(tip: Tip, index: Int, modifier: Modifier = Modifier) {
-    var completed by remember { mutableStateOf(false) }
+fun TipsCard(tip: Tip, index: Int, onDelete: () -> Unit, modifier: Modifier = Modifier) {
+//    var completed by remember { mutableStateOf(false) }
     Card(modifier = modifier.padding(8.dp), elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)) {
         val dismissState = rememberSwipeToDismissBoxState(
             confirmValueChange = { value ->
                 if (value == SwipeToDismissBoxValue.EndToStart) {
-                    completed = true
+                    onDelete()
                     false
                 } else {
                     true
@@ -108,32 +109,20 @@ fun TipsCard(tip: Tip, index: Int, modifier: Modifier = Modifier) {
                 }
             }
         ) {
-            if (completed) {
-                Box(
+            Column {
+                Image(
+                    painter = painterResource(tip.imageResourceId),
+                    contentDescription = stringResource(tip.stringResourceId),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(194.dp)
-                        .padding(16.dp),
-                    contentAlignment = androidx.compose.ui.Alignment.Center
-                ) {
-                    Text(text = "You have completed day's ${index + 1} task.")
-                }
-            } else {
-                Column {
-                    Image(
-                        painter = painterResource(tip.imageResourceId),
-                        contentDescription = stringResource(tip.stringResourceId),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(194.dp),
-                        contentScale = ContentScale.Crop
-                    )
-                    Text (
-                        text = stringResource(tip.stringResourceId),
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                }
+                        .height(194.dp),
+                    contentScale = ContentScale.Crop
+                )
+                Text (
+                    text = stringResource(tip.stringResourceId),
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.headlineSmall
+                )
             }
         }
     }
@@ -142,11 +131,13 @@ fun TipsCard(tip: Tip, index: Int, modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun TipsCardPreview () {
-    TipsCard(Tip(R.string.Tips1, R.drawable.image1), index = 0)
+    TipsCard(Tip(R.string.Tips1, R.drawable.image1), index = 0, onDelete = {})
 }
 
 @Composable
 private fun TipsList(tipsList: List<Tip>, modifier: Modifier = Modifier) {
+    val tips = remember { mutableStateListOf(*tipsList.toTypedArray()) }
+
     LazyVerticalGrid(
         columns = GridCells.Adaptive(220.dp),
         verticalArrangement = Arrangement.SpaceAround,
@@ -156,10 +147,12 @@ private fun TipsList(tipsList: List<Tip>, modifier: Modifier = Modifier) {
             ArtBlockDetailsHeaderItem()
         }
 
-        itemsIndexed (tipsList) { index, tip ->
+        items(tips, key = { it.stringResourceId }) { tip ->
+            val index = tips.indexOf(tip) // calculează index-ul curent
             TipsCard(
                 tip = tip,
                 index = index,
+                onDelete = { tips.remove(tip) },
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
         }
@@ -225,22 +218,5 @@ fun ArtBlockDetailsHeaderItem(modifier: Modifier = Modifier) {
                     .clickable { expanded = !expanded }
             )
         }
-    }
-}
-
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    _30DaysAppTheme {
-        Greeting("Android")
     }
 }
