@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
@@ -53,8 +54,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.a30daysapp.data.DataSource
 import com.example.a30daysapp.model.Tip
+import com.example.a30daysapp.model.TipsViewModel
 import com.example.a30daysapp.ui.theme._30DaysAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -63,10 +66,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             _30DaysAppTheme {
+                val tipsViewModel: TipsViewModel = viewModel()
                 Scaffold (
                     content =  {
                         TipsList(
-                            tipsList = DataSource().loadTips(),
+                            tipsList = tipsViewModel.tips,
+                            onDelete = { tip ->
+                                tipsViewModel.removeTip(tip)
+                            },
                             modifier = Modifier.padding(it)
                         )
                     }
@@ -135,9 +142,7 @@ private fun TipsCardPreview () {
 }
 
 @Composable
-private fun TipsList(tipsList: List<Tip>, modifier: Modifier = Modifier) {
-    val tips = remember { mutableStateListOf(*tipsList.toTypedArray()) }
-
+private fun TipsList(tipsList: List<Tip>, onDelete: (Tip) -> Unit, modifier: Modifier = Modifier) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(220.dp),
         verticalArrangement = Arrangement.SpaceAround,
@@ -147,12 +152,14 @@ private fun TipsList(tipsList: List<Tip>, modifier: Modifier = Modifier) {
             ArtBlockDetailsHeaderItem()
         }
 
-        items(tips, key = { it.stringResourceId }) { tip ->
-            val index = tips.indexOf(tip) // calculează index-ul curent
+        itemsIndexed(
+            items = tipsList,
+            key = { _, tip -> tip.stringResourceId }
+        ) { index, tip ->
             TipsCard(
                 tip = tip,
                 index = index,
-                onDelete = { tips.remove(tip) },
+                onDelete = { onDelete(tip) },
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
         }
