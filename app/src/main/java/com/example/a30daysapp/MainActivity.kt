@@ -224,7 +224,7 @@ private fun TipsList(tipsList: List<Tip>, onDelete: (Tip) -> Unit, modifier: Mod
     ) {
         item (span = { GridItemSpan(this.maxLineSpan) }) {
             ArtBlockDetailsHeaderItem(
-                totalTips = 10,
+                totalTips = 30,
                 remainingTips = tipsList.size,
             )
         }
