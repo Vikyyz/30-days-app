@@ -7,12 +7,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,10 +25,14 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
@@ -50,8 +54,6 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -94,7 +96,7 @@ fun TipsCard(
     dismissState: SwipeToDismissBoxState,
     modifier: Modifier = Modifier
 ) {
-
+//    The swipe to delete feature
         SwipeToDismissBox (
             state = dismissState,
             enableDismissFromEndToStart = true,
@@ -104,7 +106,6 @@ fun TipsCard(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(end = 16.dp),
-//                        .background(MaterialTheme.colorScheme.error.copy(alpha = 0.2f)),
                     contentAlignment = Alignment.CenterEnd,
 
                 )
@@ -121,49 +122,89 @@ fun TipsCard(
             Card(
                 modifier = modifier
                     .padding(8.dp)
-                    .padding(top = 8.dp),
+                    .padding(top = 8.dp)
+                    .size(width = 350.dp, height = 160.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                 shape = RectangleShape,
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
+//          Card Header
                 Text (
                     text = "Day ${tip.day + 1}",
                     color = MaterialTheme.colorScheme.background,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(10.dp),
                 )
-            Column {
-                Row (
-                    modifier = Modifier.fillMaxSize(),
-                    verticalAlignment = Alignment.Top,
+//          Image and Text + Settings row
+            Row (
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(bottom = 5.dp)
+                    .padding(start = 10.dp)
+                    .padding(end = 5.dp),
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Image(
+                    painter = painterResource(tip.imageResourceId),
+                    contentDescription = stringResource(tip.stringResourceId),
+                    modifier = Modifier
+                        .width( 150.dp)
+                        .padding(end = 5.dp),
+
+                    contentScale = ContentScale.Crop,
+                )
+//              Text + Settings
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
                 ) {
-                    Image(
-                        painter = painterResource(tip.imageResourceId),
-                        contentDescription = stringResource(tip.stringResourceId),
-                        modifier = Modifier
-                            .height(100.dp)
-                            .width( 150.dp)
-                            .padding(start = 10.dp)
-                            .padding(end = 5.dp),
-                        contentScale = ContentScale.Crop,
-                    )
-                    Text (
+                    Text(
                         text = stringResource(tip.stringResourceId),
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier
-                            .padding(end = 10.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.weight(1f)
                     )
                 }
-                Text(
-                    modifier = Modifier.padding(
-                        start = 10.dp,
-                        end = 10.dp,
-                        top = 3.dp,
-                    ),
-
-                    text = "future music player"
+                CardSettings(
+                    modifier = Modifier
+                        .padding(top = 8.dp)
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun CardSettings(modifier: Modifier) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        IconButton(
+            onClick = { expanded = true },
+        ) {
+            Icon(
+                modifier = Modifier
+                    .size(20.dp),
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = "Settings",
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("Like") },
+                onClick = {
+                    expanded = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Dislike") },
+                onClick = {
+                    expanded = false
+                }
+            )
         }
     }
 }
@@ -260,8 +301,7 @@ fun ArtBlockDetailsHeaderItem(
                         modifier = Modifier.padding(start = 4.dp),
                     )
                 }
-                Column(
-                ) {
+                Column {
                     Text(
                         text = "Days remaining: $remainingTips",
                         style = MaterialTheme.typography.labelSmall
@@ -316,7 +356,7 @@ fun TopOvalBackground(modifier: Modifier = Modifier) {
                 y = -ovalHeight * 0.32f
             )
             drawOval(
-                color = androidx.compose.ui.graphics.Color(0xFFFFA726),
+                color = Color(0xFFFFA726),
                 topLeft = topLeft,
                 size = androidx.compose.ui.geometry.Size(ovalWidth, ovalHeight)
             )
